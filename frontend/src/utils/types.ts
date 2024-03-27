@@ -31,17 +31,71 @@ export interface UserResult {
   message: string;
 }
 
-export interface ApiResultType {
-  name?: string;
-  overview: string;
-  poster_path: string;
-  title?: string;
-}
-
-export interface ShowResult extends ApiResultType {
+export interface GenreType {
+  id: number;
   name: string;
 }
 
-export interface MovieResult extends ApiResultType {
+export interface StreamingInfoType {
+  link: string;
+  service: string;
+  streamingType: string;
+  videoLink: string;
+}
+
+export interface BaseResult {
+  cast: string;
+  genres: GenreType[];
+  imdbId: string;
+  overview: string;
+  streamingInfo: StreamingInfoType[];
   title: string;
+  tmdbId: number;
+  type: string;
+}
+
+export interface MovieResult extends BaseResult {
+  directors: string[];
+  year: number;
+}
+
+export interface SeriesResult extends BaseResult {
+  creators: string[];
+  episodeCount: number;
+  firstAirYear: number;
+  lastAirYear: number;
+  seasonCount: number;
+  seasons: object[];
+  status: {
+    statusCode: number;
+    statusText: string;
+  };
+}
+
+export interface OverallResultType {
+  cast: string;
+  creators?: string[];
+  directors?: string[];
+  episodeCount?: number;
+  firstAirYear?: number;
+  genres: GenreType[];
+  imdbId: string;
+  lastAirYear?: number;
+  overview: string;
+  seasonCount?: number;
+  seasons?: object[];
+  status?: {
+    statusCode: number;
+    statusText: string;
+  };
+  streamingInfo: StreamingInfoType[];
+  title: string;
+  tmdbId: number;
+  type: string;
+  year?: number;
+}
+
+export interface AllResultsType {
+  movies: OverallResultType[];
+  series: OverallResultType[];
 }

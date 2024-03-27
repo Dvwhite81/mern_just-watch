@@ -1,6 +1,6 @@
 import { SyntheticEvent, useEffect, useState } from 'react';
 
-import { ApiResultType, UserType } from '../utils/types';
+import { AllResultsType, UserType } from '../utils/types';
 import { useNavigate } from 'react-router-dom';
 import { searchForTitle } from '../services/apiService';
 
@@ -10,7 +10,7 @@ interface HomePageProps {
 
 const HomePage = ({ loggedInUser }: HomePageProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<ApiResultType[]>([]);
+  const [searchResults, setSearchResults] = useState<AllResultsType>();
 
   const navigate = useNavigate();
 
@@ -20,13 +20,15 @@ const HomePage = ({ loggedInUser }: HomePageProps) => {
     if (!loggedInUser) {
       navigate('/login');
     }
-  });
+  }, [loggedInUser, navigate]);
 
   const handleSearch = async (e: SyntheticEvent) => {
+    console.log('e:', e);
     e.preventDefault();
 
     const results = await searchForTitle(searchTerm);
-    console.log('results:', results);
+    if (!results) return;
+
     setSearchResults(results);
   };
 
@@ -45,17 +47,24 @@ const HomePage = ({ loggedInUser }: HomePageProps) => {
         </button>
       </form>
 
-      <div className="results-container">
-        {searchResults.map((result, index) => (
-          <div key={index}>
-            <p>Result: {result.title || result.name}</p>
-            <img
-              style={{ height: 100, width: 100 }}
-              src={`https://image.tmdb.org/t/p/w500${result.poster_path}`}
-              alt="poster"
-            />
-          </div>
-        ))}
+      <div className="results-display">
+        <h3>Movies</h3>
+        {searchResults &&
+          searchResults.movies.map((result, index) => (
+            <div key={index}>
+              <p>Result: {result.title}</p>
+            </div>
+          ))}
+      </div>
+
+      <div className="results-display">
+        <h3>Series</h3>
+        {searchResults &&
+          searchResults.series.map((result, index) => (
+            <div key={index}>
+              <p>Result: {result.title}</p>
+            </div>
+          ))}
       </div>
     </div>
   );
