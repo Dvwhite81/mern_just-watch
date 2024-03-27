@@ -1,30 +1,17 @@
 import { SyntheticEvent, useEffect, useState } from 'react';
 
-import { EventType, UserType } from '../utils/types';
-import AddEventForm from '../components/AddEventForm';
+import { ApiResultType, UserType } from '../utils/types';
 import { useNavigate } from 'react-router-dom';
+import { searchForTitle } from '../services/apiService';
 
 interface HomePageProps {
   loggedInUser: UserType | null;
-  userEvents: EventType[];
-  addEvent: (
-    description: string,
-    allDay: boolean,
-    start: string,
-    end: string
-  ) => void;
-  handleDeleteEvent: (eventId: string) => void;
-  handleLogOut: (e: SyntheticEvent) => void;
 }
 
-const HomePage = ({
-  loggedInUser,
-  userEvents,
-  addEvent,
-  handleDeleteEvent,
-  handleLogOut,
-}: HomePageProps) => {
-  const [showEvents, setShowEvents] = useState(false);
+const HomePage = ({ loggedInUser }: HomePageProps) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<ApiResultType[]>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,41 +22,41 @@ const HomePage = ({
     }
   });
 
+  const handleSearch = async (e: SyntheticEvent) => {
+    e.preventDefault();
+
+    const results = await searchForTitle(searchTerm);
+    console.log('results:', results);
+    setSearchResults(results);
+  };
+
   return (
     <div className="page home-page">
       <h2>Logged In User: {loggedInUser?.username}</h2>
-      <button type="button" onClick={handleLogOut}>
-        Log Out
-      </button>
-
-      {!showEvents && (
-        <button type="button" onClick={() => setShowEvents(true)}>
-          Show Events
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={({ target }) => setSearchTerm(target.value)}
+          placeholder="Search for a movie or show"
+        />
+        <button type="submit" className="btn btn-submit">
+          Search
         </button>
-      )}
+      </form>
 
-      {showEvents && (
-        <div>
-          <button type="button" onClick={() => setShowEvents(false)}>
-            Hide Events
-          </button>
-          <ul>
-            {userEvents.map((event) => (
-              <li key={event._id}>
-                <p>{event.description}</p>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteEvent(event._id)}
-                >
-                  x
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <AddEventForm addEvent={addEvent} />
+      <div className="results-container">
+        {searchResults.map((result, index) => (
+          <div key={index}>
+            <p>Result: {result.title || result.name}</p>
+            <img
+              style={{ height: 100, width: 100 }}
+              src={`https://image.tmdb.org/t/p/w500${result.poster_path}`}
+              alt="poster"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -2,8 +2,6 @@ export interface UserType {
   _id: string;
   username: string;
   password: string;
-  events: EventType[];
-  toDos: ToDoType[];
 }
 
 export interface InputField {
@@ -33,43 +31,17 @@ export interface UserResult {
   message: string;
 }
 
-export interface ToDoFormData {
+export interface ApiResultType {
+  name?: string;
+  overview: string;
+  poster_path: string;
+  title?: string;
+}
+
+export interface ShowResult extends ApiResultType {
+  name: string;
+}
+
+export interface MovieResult extends ApiResultType {
   title: string;
-  urgency: string;
-  color: string;
-}
-
-export interface ToDoType extends ToDoFormData {
-  _id: string;
-}
-
-export interface EventFormData {
-  description: string;
-  allDay: boolean;
-  start: string;
-  end: string;
-}
-
-export interface EventType {
-  _id: string;
-  description: string;
-  allDay: boolean;
-  start: string;
-  end: string;
-}
-
-export interface EventStyleType {
-  style: {
-    backgroundColor: string | undefined;
-    borderColor: string | undefined;
-  };
-}
-
-export interface CurrentDayType {
-  currentMonth: boolean;
-  date: Date;
-  month: number;
-  number: number;
-  selected: boolean;
-  year: number;
 }
