@@ -3,6 +3,7 @@ import { MovieResult, OverallResultType, SeriesResult } from '../utils/types';
 import { isMovie, isSeries, moviesAreValidated } from '../utils/helpers';
 
 const API_KEY = import.meta.env.VITE_API_KEY;
+const BEARER_TOKEN = import.meta.env.VITE_BEARER_TOKEN;
 
 const sortResults = (data: OverallResultType[]) => {
   const movies = [];
@@ -58,8 +59,7 @@ export const getDetails = async (imdbId: string) => {
     url: `https://api.themoviedb.org/3/find/${imdbId}?external_source=imdb_id`,
     headers: {
       accept: 'application/json',
-      Authorization:
-        'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMGNiNmJkOTlhM2I3NmQzMjZlY2MyYmQwZTM1NzIyNyIsInN1YiI6IjY2MDI0OWUxYjg0Y2RkMDE3ZGY2ZjYzZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.NabNU4YQXEdJs1FbaipbpY5MDORPUk7lvYUZcm78A-4',
+      Authorization: BEARER_TOKEN,
     },
   };
 
