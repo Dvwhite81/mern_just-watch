@@ -10,14 +10,14 @@ interface ResultCardProps {
 const ResultCard = ({ result }: ResultCardProps) => {
   const navigate = useNavigate();
 
-  const { imdbId, title } = result;
+  const { imdbId, title, type } = result;
 
   const handleClick = async (e: SyntheticEvent, imdbId: string) => {
     e.preventDefault();
     console.log('handleClick');
     const details = await getDetails(imdbId);
     console.log('details:', details);
-    navigate(`/${imdbId}`, { state: { details } });
+    navigate(`/${imdbId}`, { state: { details, type } });
   };
 
   return (
