@@ -2,3 +2,20 @@
   height: 100%;
   width: 100%;
 }
+
+.results-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 2rem;
+}
+
+.card {
+  background-color: lightblue;
+}
+
+.card:hover {
+  background-color: darkblue;
+  color: white;
+  cursor: pointer;
+}

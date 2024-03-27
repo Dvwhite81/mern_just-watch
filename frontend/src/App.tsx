@@ -1,19 +1,21 @@
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import moment from 'moment';
 
-import { AuthResult, EventType, UserType } from './utils/types';
+import { AuthResult, MovieResult, SeriesResult, UserType } from './utils/types';
 import userService from './services/userService';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import './App.css';
+import ProfilePage from './pages/ProfilePage';
+import ResultPage from './pages/ResultPage';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState<UserType | null>(null);
-  const [userEvents, setUserEvents] = useState<EventType[]>([]);
+  const [userMovies, setUserMovies] = useState<MovieResult[]>([]);
+  const [userSeries, setUserSeries] = useState<SeriesResult[]>([]);
 
   const navigate = useNavigate();
 
@@ -23,17 +25,16 @@ function App() {
 
       if (token) {
         const result = await userService.getUserByToken(token);
-        console.log('checkLogged result:', result);
         if (result) {
           const { success, user } = result;
-          console.log('checkLogged success:', success);
 
           if (success && user) {
             const { user } = result;
-            console.log('checkLogged user:', user);
 
             setLoggedInUser(user);
-            setUserEvents(user.events);
+            setUserMovies(user.savedMovies);
+            setUserSeries(user.savedSeries);
+            console.log('App navigate to home');
             navigate('/');
           } else {
             localStorage.removeItem('token');
@@ -43,7 +44,8 @@ function App() {
     };
 
     checkedLoggedIn();
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRegister = async (
     username: string,
@@ -86,17 +88,15 @@ function App() {
       password
     );
 
-    console.log('handleLogin result:', result);
-
     if (result) {
       const { success, message } = result;
       if (success) {
         const { user, token } = result;
-        console.log('login USER:', user);
         if (user && token) {
           setLoggedInUser(user);
           localStorage.setItem('token', token);
-          setUserEvents(user.events);
+          setUserMovies(user.savedMovies);
+          setUserSeries(user.savedSeries);
           navigate('/');
         }
 
@@ -107,38 +107,29 @@ function App() {
     }
   };
 
-  const addEvent = async (
-    description: string,
-    allDay: boolean,
-    start: string,
-    end: string
+  /*
+  const saveMovie = async (
+    movie: MovieResult
   ) => {
     const token = localStorage.getItem('token');
 
     if (!loggedInUser || !token) return;
 
-    const newEvent = {
-      description,
-      allDay,
-      start: moment(start).format('yyyy-MM-DD'),
-      end: moment(end).format('yyyy-MM-DD'),
-    };
-
-    const result = await userService.addUserEvent(token, newEvent);
+    const result = await userService.addUserMovie(token, movie);
 
     if (result) {
       const { success, message } = result;
 
       if (success) {
         toast.success(message);
-        setUserEvents(result.events);
+        setUserMovies(result.savedMovies);
       } else {
         toast.error(message);
       }
     }
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
+  const handleDeleteMovie = async (eventId: string) => {
     console.log('handleDeleteEvent eventId:', eventId);
     if (!loggedInUser) return;
 
@@ -151,7 +142,7 @@ function App() {
       const { success, events, message } = result;
 
       if (success) {
-        setUserEvents(events);
+        setUserMovies(events);
         toast.success(message);
       } else {
         toast.error(message);
@@ -167,22 +158,12 @@ function App() {
     navigate('/login');
     toast.success('Logged out');
   };
+  */
 
   return (
     <div id="main-container">
       <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              loggedInUser={loggedInUser}
-              userEvents={userEvents}
-              addEvent={addEvent}
-              handleDeleteEvent={handleDeleteEvent}
-              handleLogOut={handleLogOut}
-            />
-          }
-        />
+        <Route path="/" element={<HomePage loggedInUser={loggedInUser} />} />
         <Route
           path="/register"
           element={<RegisterPage handleRegister={handleRegister} />}
@@ -191,6 +172,17 @@ function App() {
           path="/login"
           element={<LoginPage handleLogin={handleLogin} />}
         />
+        <Route
+          path="/profile"
+          element={
+            <ProfilePage
+              loggedInUser={loggedInUser}
+              savedMovies={userMovies}
+              savedSeries={userSeries}
+            />
+          }
+        />
+        <Route path="/:imdbId" element={<ResultPage />} />
       </Routes>
       <ToastContainer theme="colored" newestOnTop />
     </div>

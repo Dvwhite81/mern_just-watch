@@ -1,4 +1,4 @@
-import { OverallResultType } from './types';
+import { AllResultsType, OverallResultType } from './types';
 
 const isEither = (result: OverallResultType) => {
   if (
@@ -19,19 +19,21 @@ const isEither = (result: OverallResultType) => {
 };
 
 export const isMovie = (result: OverallResultType) => {
-  if (
-    result &&
-    isEither(result) &&
-    result.type === 'movie' &&
-    result.directors &&
-    Array.isArray(result.directors) &&
-    result.directors.every((director) => typeof director === 'string') &&
-    result.year
-  ) {
-    return true;
+  if (!result || result.type !== 'movie' || !result.directors || !result.year) {
+    return false;
   }
 
-  return false;
+  const { directors, year } = result;
+
+  if (
+    !Array.isArray(directors) ||
+    directors.some((director) => typeof director !== 'string') ||
+    typeof year !== 'number'
+  ) {
+    return false;
+  }
+
+  return true;
 };
 
 export const isSeries = (result: OverallResultType) => {
@@ -53,4 +55,18 @@ export const isSeries = (result: OverallResultType) => {
   }
 
   return false;
+};
+
+export const moviesAreValidated = (results: OverallResultType[]) => {
+  for (const result of results) {
+    if (!isMovie(result)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export const thereAreResults = (results: AllResultsType) => {
+  return results && (results.movies.length > 0 || results.series.length > 0);
 };

@@ -2,6 +2,8 @@ export interface UserType {
   _id: string;
   username: string;
   password: string;
+  savedMovies: MovieResult[];
+  savedSeries: SeriesResult[];
 }
 
 export interface InputField {
@@ -54,12 +56,28 @@ export interface BaseResult {
   type: string;
 }
 
-export interface MovieResult extends BaseResult {
+export interface MovieResult {
+  cast: string;
+  genres: GenreType[];
+  imdbId: string;
+  overview: string;
+  streamingInfo: StreamingInfoType[];
+  title: string;
+  tmdbId: number;
+  type: string;
   directors: string[];
   year: number;
 }
 
-export interface SeriesResult extends BaseResult {
+export interface SeriesResult {
+  cast: string;
+  genres: GenreType[];
+  imdbId: string;
+  overview: string;
+  streamingInfo: StreamingInfoType[];
+  title: string;
+  tmdbId: number;
+  type: string;
   creators: string[];
   episodeCount: number;
   firstAirYear: number;
@@ -74,17 +92,17 @@ export interface SeriesResult extends BaseResult {
 
 export interface OverallResultType {
   cast: string;
-  creators?: string[];
-  directors?: string[];
-  episodeCount?: number;
-  firstAirYear?: number;
+  creators: string[];
+  directors: string[];
+  episodeCount: number;
+  firstAirYear: number;
   genres: GenreType[];
   imdbId: string;
-  lastAirYear?: number;
+  lastAirYear: number;
   overview: string;
-  seasonCount?: number;
-  seasons?: object[];
-  status?: {
+  seasonCount: number;
+  seasons: object[];
+  status: {
     statusCode: number;
     statusText: string;
   };
@@ -92,10 +110,10 @@ export interface OverallResultType {
   title: string;
   tmdbId: number;
   type: string;
-  year?: number;
+  year: number;
 }
 
 export interface AllResultsType {
-  movies: OverallResultType[];
-  series: OverallResultType[];
+  movies: MovieResult[];
+  series: SeriesResult[];
 }

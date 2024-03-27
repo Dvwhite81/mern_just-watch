@@ -3,69 +3,61 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import { AllResultsType, UserType } from '../utils/types';
 import { useNavigate } from 'react-router-dom';
 import { searchForTitle } from '../services/apiService';
+import ResultsDisplay from '../components/ResultsDisplay';
+import SearchForm from '../components/SearchForm';
+import { thereAreResults } from '../utils/helpers';
 
 interface HomePageProps {
   loggedInUser: UserType | null;
 }
 
 const HomePage = ({ loggedInUser }: HomePageProps) => {
+  const [searchType, setSearchType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<AllResultsType>();
+  const [searchResults, setSearchResults] = useState<AllResultsType>({
+    movies: [],
+    series: [],
+  });
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('useEffect loggedInUser:', loggedInUser);
-
     if (!loggedInUser) {
+      console.log('HomePage navigate to login');
       navigate('/login');
     }
-  }, [loggedInUser, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedInUser]);
 
   const handleSearch = async (e: SyntheticEvent) => {
     console.log('e:', e);
     e.preventDefault();
 
-    const results = await searchForTitle(searchTerm);
+    const results = await searchForTitle(searchTerm, searchType);
     if (!results) return;
-
+    console.log('handleSearch results:', results);
     setSearchResults(results);
   };
 
   return (
     <div className="page home-page">
-      <h2>Logged In User: {loggedInUser?.username}</h2>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={({ target }) => setSearchTerm(target.value)}
-          placeholder="Search for a movie or show"
-        />
-        <button type="submit" className="btn btn-submit">
-          Search
-        </button>
-      </form>
+      <SearchForm
+        handleSearch={handleSearch}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        setSearchType={setSearchType}
+      />
 
-      <div className="results-display">
-        <h3>Movies</h3>
-        {searchResults &&
-          searchResults.movies.map((result, index) => (
-            <div key={index}>
-              <p>Result: {result.title}</p>
-            </div>
-          ))}
-      </div>
+      {searchResults && thereAreResults(searchResults) && (
+        <>
+          <ResultsDisplay label="Movies" results={searchResults.movies} />
+          <ResultsDisplay label="TV Series" results={searchResults.series} />
+        </>
+      )}
 
-      <div className="results-display">
-        <h3>Series</h3>
-        {searchResults &&
-          searchResults.series.map((result, index) => (
-            <div key={index}>
-              <p>Result: {result.title}</p>
-            </div>
-          ))}
-      </div>
+      {searchResults && !thereAreResults(searchResults) && (
+        <h4>No Results. Try a different search!</h4>
+      )}
     </div>
   );
 };
